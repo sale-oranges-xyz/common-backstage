@@ -1,0 +1,7 @@
+
+ # JWT configuration  expiration单位：分钟
+jwt:
+  header: Authorization
+  secret: mySecret
+  expiration: 60
+  tokenHead: Bearer
