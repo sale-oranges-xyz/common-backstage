@@ -3,6 +3,7 @@ package com.github.geng.security.filter;
 import com.github.geng.exception.ErrorMsg;
 import com.github.geng.util.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -17,9 +18,11 @@ import java.io.IOException;
  * 定义 401 处理器
  * @author geng
  */
-@Component
 @Slf4j
+@Component
+@ConditionalOnProperty(value = {"tokenWeb.enable"}) // 看情况动态创建bean
 public class EntryPointUnauthorizedHandler implements AuthenticationEntryPoint {
+
     @Override
     public void commence(HttpServletRequest httpServletRequest,
                          HttpServletResponse httpServletResponse,

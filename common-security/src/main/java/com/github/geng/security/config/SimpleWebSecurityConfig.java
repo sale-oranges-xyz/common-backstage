@@ -1,5 +1,6 @@
 package com.github.geng.security.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -7,13 +8,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 
 /**
- * 最简单的spring security 配置
+ * 最简单的spring security 配置,可用于微服务配置
  * @author geng
  */
 @Configuration
 @EnableWebSecurity // 启动security
+@ConditionalOnProperty(value = {"microWeb.enable"}, matchIfMissing = true) // 看情况动态创建bean
 public class SimpleWebSecurityConfig extends AbstractWebSecurityConfig {
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

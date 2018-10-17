@@ -9,9 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 public interface AuthenticationSerious {
 
     /**
-     * @param userAuthToken 获取的用户token
-     * @param httpRequest request 请求
+     * @param httpRequest http请求对象
      * @throws Exception 验证异常
      */
-    void authentication(String userAuthToken, HttpServletRequest httpRequest) throws Exception;
+    void authentication(HttpServletRequest httpRequest) throws Exception;
 }

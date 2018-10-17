@@ -60,7 +60,7 @@ public abstract class AbstractAccessFilter extends ZuulFilter {
         } else { // 从token 获取用户信息
             String realToken = this.getRealToken(token); // 或者真正的token数据
             try {
-                TokenInfo tokenInfo = tokenService.parseToken(realToken);
+                TokenInfo tokenInfo = this.tokenService.parseToken(realToken);
                 this.validateTokenInfo(tokenInfo, (String)context.get(REQUEST_URI_KEY), request.getMethod(), context);
                 // 用户信息写入请求头，供后续内部微服务使用
                 context.addZuulRequestHeader(DataConstants.USER_ID, tokenInfo.getId());

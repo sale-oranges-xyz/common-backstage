@@ -1,4 +1,4 @@
-package com.github.geng.admin.entity;
+package com.github.geng.entity;
 
 import lombok.Getter;
 import lombok.Setter;

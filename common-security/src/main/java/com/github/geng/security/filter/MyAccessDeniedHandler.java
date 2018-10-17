@@ -3,6 +3,7 @@ package com.github.geng.security.filter;
 import com.github.geng.exception.ErrorMsg;
 import com.github.geng.util.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -17,8 +18,9 @@ import java.io.IOException;
  * 注册 403 处理器
  * @author geng
  */
-@Component
 @Slf4j
+@Component
+@ConditionalOnProperty(value = {"tokenWeb.enable"}) // 看情况动态创建bean
 public class MyAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override

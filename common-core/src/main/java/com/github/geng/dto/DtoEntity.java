@@ -1,5 +1,6 @@
-package com.github.geng.admin.entity;
+package com.github.geng.dto;
 
+import com.github.geng.entity.BaseLongIdEntity;
 import com.github.geng.util.IdEncryptUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,19 +14,19 @@ import java.io.Serializable;
 @MappedSuperclass
 @Setter
 @Getter
-public class BaseDtoEntity implements Serializable {
+public class DtoEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String id;
 
     // ==========================================================
     // constructor
-    public BaseDtoEntity(BaseLongIdEntity baseLongIdEntity) {
+    public DtoEntity(BaseLongIdEntity baseLongIdEntity) {
         super();
         this.id = IdEncryptUtils.encode(baseLongIdEntity.getId());
     }
 
-    public BaseDtoEntity() {
+    public DtoEntity() {
         super();
     }
 

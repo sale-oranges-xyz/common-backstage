@@ -1,5 +1,6 @@
 package com.github.geng.token.config;
 
+import com.github.geng.token.info.Token;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,7 +24,7 @@ import org.springframework.context.annotation.PropertySource;
 @Configuration
 @PropertySource(value = "classpath:jwtConfig.yml")
 @ConfigurationProperties(prefix = "jwt", ignoreUnknownFields =false)
-public class UserTokenConfig {
+public class UserTokenConfig implements Token {
 
     @Value("${header}")
     private String header;
@@ -48,5 +49,4 @@ public class UserTokenConfig {
             return header.substring(tokenHeader.length()).trim();
         }
     }
-
 }
