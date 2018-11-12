@@ -12,4 +12,5 @@
   | - common-swagger 接口api说明，前后端交互使用。注意api接口包名要以*.controller命名
   | - common-token token部分抽象接口
   | - common-web web部分通用代码
+  | - common-excel excel 操作模块
 ```

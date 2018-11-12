@@ -8,7 +8,6 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.5.13.RELEASE</version>
-        <relativePath/> <!-- lookup parent from com.github.geng.admin.repository -->
     </parent>
 
     <groupId>com.github.geng</groupId>
@@ -28,6 +27,7 @@
         <module>common-swagger</module>
         <module>common-token</module>
         <module>common-base-core</module>
+        <module>common-excel</module>
     </modules>
 
     <properties>
