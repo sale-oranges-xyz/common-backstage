@@ -22,17 +22,17 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Data
 @Configuration
-@PropertySource(value = "classpath:jwtConfig.yml")
-@ConfigurationProperties(prefix = "jwt", ignoreUnknownFields =false)
+// @PropertySource(value = "classpath:jwtConfig.yml")
+// @ConfigurationProperties(prefix = "token", ignoreUnknownFields =false)
 public class UserTokenConfig implements Token {
 
-    @Value("${header}")
+    @Value("${token.header}")
     private String header;
-    @Value("${secret}")
+    @Value("${token.secret}")
     private String secret;
-    @Value("${expiration}")
+    @Value("${token.expiration}")
     private int expiration;
-    @Value("${tokenHead}")
+    @Value("${token.tokenHead}")
     private String tokenHeader;
 
     // -------------------------------------------------
@@ -43,8 +43,8 @@ public class UserTokenConfig implements Token {
      * @return 真正token
      */
     public String getToken(String header) {
-        if (header.length() <= tokenHeader.length()) {
-            return "";
+        if (null == tokenHeader || header.length() <= tokenHeader.length()) {
+            return null;
         } else {
             return header.substring(tokenHeader.length()).trim();
         }

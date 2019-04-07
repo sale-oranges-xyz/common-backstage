@@ -28,6 +28,7 @@
         <module>common-token</module>
         <module>common-base-core</module>
         <module>common-excel</module>
+        <module>common-orm</module>
     </modules>
 
     <properties>
@@ -42,6 +43,13 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
+
         <!-- 测试模块 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

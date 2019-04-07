@@ -5,12 +5,15 @@ import com.github.geng.constant.DataConstants;
 import com.github.geng.exception.NotLoginException;
 import com.github.geng.mvc.util.RequestUtil;
 import com.github.geng.mvc.util.ResponseUtil;
+import com.github.geng.response.ApiPage;
 import com.github.geng.response.ApiResponseData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author geng
@@ -60,5 +63,16 @@ public class BaseController {
      */
     protected ApiResponseData error (String message) {
         return ResponseUtil.error(message);
+    }
+
+    /**
+     * api分页数据处理
+     * @param dtoList 数据列表
+     * @param page 分页数据
+     * @param <T> 返回数据类型
+     * @return 返回响应数据
+     */
+    protected <T> ApiResponseData<ApiPage<T>> wrapPage(List<T> dtoList, Page page) {
+        return ResponseUtil.success(new ApiPage<>(page.getTotalPages(), page.getTotalElements(), page.getSize(), dtoList));
     }
 }

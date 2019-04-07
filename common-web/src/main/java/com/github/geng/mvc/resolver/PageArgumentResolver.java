@@ -24,7 +24,7 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
     private static final String PAGE_NO_NAME = "page_no";
     private static final String PAGE_SIZE_NAME = "page_size";
     private static final String SORT = "sort";
-    private static final String SORT_NAME = "sort_name";
+    private static final String SORT_NAME = "page_sort";
 
     /**
      * 用于判定是否需要处理该参数分解，返回true为需要，并会去调用下面的方法resolveArgument

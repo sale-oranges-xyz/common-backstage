@@ -1,24 +1,28 @@
 package com.github.geng.security.filter;
 
 import com.github.geng.constant.DataConstants;
+import com.github.geng.constant.ResponseConstants;
 import com.github.geng.exception.ErrorMsg;
-import com.github.geng.security.service.SysUserDetails;
-import com.github.geng.security.service.SysUserDetailsService;
+import com.github.geng.security.entity.SysUserDetails;
 import com.github.geng.token.TokenService;
 import com.github.geng.token.info.Token;
 import com.github.geng.token.info.TokenInfo;
 import com.github.geng.util.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
 
 
 /**
@@ -26,61 +30,59 @@ import java.util.Date;
  * @author geng
  */
 @Slf4j
-public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter {
+public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
-//    @Autowired
-//    private AuthenticationSerious authenticationSerious;
-    @Autowired
     private TokenService tokenService;
-    @Autowired
     private Token token;
     /**
      * Spring Security 的核心操作服务类
      * 在当前类中将使用 UserDetailsService 来获取 userDetails 对象
      */
-    @Autowired
-    private SysUserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException {
+    protected void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
 
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
         try {
             // token
-            // 尝试获取请求头的 token
-            String headerToken = httpRequest.getHeader(this.token.getTokenHeader());
-            String realToken = this.token.getToken(headerToken);
-            // 使用token 解析
-            TokenInfo tokenInfo = this.tokenService.parseToken(realToken);
+            String realToken = this.getToken(httpRequest);
+            if (null == realToken) {
+                chain.doFilter(httpRequest, response);
+            } else {
+                // 使用token 解析
+                TokenInfo tokenInfo = this.tokenService.parseToken(realToken);
 
-            // UserDetails 类是 Spring Security 用于保存用户权限的实体类
-            SysUserDetails userDetails = this.userDetailsService.loadUserByUsername(tokenInfo.getName());
-            if (userDetails.getUsername().equals(tokenInfo.getName())) { // 用户名不一致
-                if (this.validateToken(realToken, userDetails)) {
-                    // 暂时不需要权限验证
-                    // 生成通过认证
-                    // UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
-                    //         = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    // 将权限写入本次会话
-                    // super.setDetails(httpRequest, usernamePasswordAuthenticationToken);
-                    // SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                    // 用户信息写入request
-                    request.setAttribute(DataConstants.USER_ID, tokenInfo.getId());
-                    request.setAttribute(DataConstants.USER_NAME, tokenInfo.getName());
-                    chain.doFilter(request, response);
+                // UserDetails 类是 Spring Security 用于保存用户权限的实体类
+                SysUserDetails userDetails = (SysUserDetails)this.userDetailsService.loadUserByUsername(tokenInfo.getName());
+                if (userDetails.getUsername().equals(tokenInfo.getName())) { // 用户名一致
+                    if (this.validateToken(realToken, userDetails)) {
+                        // 生成通过认证
+                        UsernamePasswordAuthenticationToken authentication
+                                = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        // 将权限写入本次会话
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        // 用户信息写入request
+                        httpRequest.setAttribute(DataConstants.USER_ID, tokenInfo.getId());
+                        httpRequest.setAttribute(DataConstants.USER_NAME, tokenInfo.getName());
+                        chain.doFilter(httpRequest, response);
+                        return;
+                    }
                 }
+                this.sendErrorMsg(response, "用户登录超时，请重新登录");
             }
-            this.sendErrorMsg(response, "用户登录超时，请重新登录");
         } catch (Exception e) {
+            logger.error("token 过滤器处理异常", e);
             this.sendErrorMsg(response, e.getMessage());
         }
     }
 
-    private void sendErrorMsg (ServletResponse response, String errMsg) throws IOException{
+    // private methods ------------------------------------------------------------------------
+    private void sendErrorMsg (HttpServletResponse response, String errMsg) throws IOException{
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        ErrorMsg errorMsg = new ErrorMsg(errMsg, HttpStatus.FORBIDDEN.value());
+        ErrorMsg errorMsg = new ErrorMsg(errMsg, ResponseConstants.USER_INVALID_TOKEN);
         response.getWriter().print(JSONUtil.createJson(errorMsg));
         response.getWriter().flush();
     }
@@ -96,9 +98,31 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
         // 若是检查通过
         Date expirationDate = tokenService.getExpirationDate(realToken);
         if (new Date().before(expirationDate)) { // 没有过期
-            return !userDetails.isPasswordUpdate(expirationDate);
+            return !userDetails.isUpdatedPassword(expirationDate);
         }
         return false;
+    }
+
+    private String getToken(HttpServletRequest httpRequest) {
+        String tokenHeader = httpRequest.getHeader(this.token.getHeader());
+        if (null != tokenHeader) {
+            return this.token.getToken(tokenHeader);
+        }
+        return null;
+    }
+
+    // setters ----------------------------------------------------------------------
+    @Autowired
+    public void setTokenService(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
+    @Autowired
+    public void setToken(Token token) {
+        this.token = token;
+    }
+    @Autowired
+    public void setUserDetailsService(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 }
 

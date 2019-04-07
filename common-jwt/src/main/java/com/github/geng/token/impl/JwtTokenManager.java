@@ -22,8 +22,12 @@ import java.util.Map;
 @Component(value = "JwtTokenService")
 public class JwtTokenManager implements TokenService {
 
-    @Autowired
     private UserTokenConfig jwtConfig;
+
+    @Override
+    public boolean isMatch(String type) {
+        return type.equals(TokenConstants.JWT_TYPE);
+    }
 
     @Override
     public TokenInfo parseToken(String token) throws NotLoginException {
@@ -110,4 +114,9 @@ public class JwtTokenManager implements TokenService {
         return new Date(System.currentTimeMillis() + jwtConfig.getExpiration() * 60000);
     }
 
+    // setters ------------------------------------------------------------------------
+    @Autowired
+    public void setJwtConfig(UserTokenConfig jwtConfig) {
+        this.jwtConfig = jwtConfig;
+    }
 }

@@ -7,8 +7,15 @@ package com.github.geng.constant;
  */
 public class ResponseConstants {
     private ResponseConstants() { }
-    // ------------------------------------------------
-    // 用户端token
+
+    /**
+     * api请求通过
+     */
+    public static int OK = 0;
+    /**
+     * api请求异常
+     */
+    public static int ERROR = 9;
     /**
      * 用户token无效
      */

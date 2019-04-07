@@ -16,4 +16,9 @@ public class TokenConstants {
     public static final String RECORD_NAME = "name";
     public static final String CLAIM_KEY_USERNAME = "sub";
     public static final String CLAIM_KEY_CREATED = "created";
+
+
+    // token 类型
+    public static final String JWT_TYPE = "jwt";
+
 }

@@ -1,5 +1,6 @@
 package com.github.geng.security.filter;
 
+import com.github.geng.constant.ResponseConstants;
 import com.github.geng.exception.ErrorMsg;
 import com.github.geng.util.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -19,20 +20,18 @@ import java.io.IOException;
  * @author geng
  */
 @Slf4j
-@Component
-@ConditionalOnProperty(value = {"tokenWeb.enable"}) // 看情况动态创建bean
 public class EntryPointUnauthorizedHandler implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest httpServletRequest,
                          HttpServletResponse httpServletResponse,
-                         AuthenticationException e) throws IOException, ServletException {
+                         AuthenticationException e) throws IOException {
         //返回json形式的错误信息
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setContentType("application/json");
 
         log.debug("请求路径:{},token无效", httpServletRequest.getRequestURI());
-        httpServletResponse.getWriter().println(JSONUtil.createJson(new ErrorMsg("无效token", HttpStatus.FORBIDDEN.value())));
+        httpServletResponse.getWriter().println(JSONUtil.createJson(new ErrorMsg("无效token", ResponseConstants.USER_INVALID_TOKEN)));
         httpServletResponse.getWriter().flush();
     }
 }

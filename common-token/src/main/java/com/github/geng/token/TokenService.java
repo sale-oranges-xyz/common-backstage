@@ -14,6 +14,9 @@ import java.util.Date;
  */
 public interface TokenService {
 
+    
+    boolean isMatch(String type);
+
     /**
      * 从token解析出token数据
      * @param token token

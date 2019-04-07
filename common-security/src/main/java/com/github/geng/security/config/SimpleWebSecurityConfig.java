@@ -13,7 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
  */
 @Configuration
 @EnableWebSecurity // 启动security
-@ConditionalOnProperty(value = {"microWeb.enable"}, matchIfMissing = true) // 看情况动态创建bean
+@ConditionalOnProperty(value = {"security.simple"}) // 看情况动态创建bean
 public class SimpleWebSecurityConfig extends AbstractWebSecurityConfig {
 
     @Override

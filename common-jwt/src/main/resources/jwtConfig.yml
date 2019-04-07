@@ -1,5 +1,6 @@
 
- # JWT configuration  expiration单位：分钟
+# 移动到application 配置
+# JWT configuration  expiration单位：分钟
 jwt:
   header: Authorization
   secret: mySecret

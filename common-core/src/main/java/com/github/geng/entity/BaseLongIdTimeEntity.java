@@ -16,8 +16,8 @@ import java.util.Date;
 public class BaseLongIdTimeEntity extends BaseLongIdEntity {
     private static final long serialVersionUID = 1L;
 
-    private Date createdTime;
-    private Date modifiedTime;
+    private Date createdTime;               // 创建时间
+    private Date modifiedTime;              // 修改时间
 
     // ----------------------------------------------------
     // constructors

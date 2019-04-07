@@ -1,12 +1,7 @@
 package com.github.geng.mvc.util;
 
+import com.github.geng.constant.ResponseConstants;
 import com.github.geng.response.ApiResponseData;
-import com.github.geng.util.JSONUtil;
-import org.springframework.http.HttpStatus;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * api 响应工具处理类
@@ -21,7 +16,7 @@ public class ResponseUtil {
      * @return 响应数据
      */
     public static <T> ApiResponseData<T> success(T data) {
-        return new ApiResponseData<>(HttpStatus.OK.value(), data);
+        return new ApiResponseData<>(ResponseConstants.OK, data);
     }
 
     /**
@@ -31,7 +26,7 @@ public class ResponseUtil {
      */
     @SuppressWarnings("unchecked")
     public static ApiResponseData error(String message) {
-        return new ApiResponseData(HttpStatus.INTERNAL_SERVER_ERROR.value(), message);
+        return new ApiResponseData(ResponseConstants.ERROR, message);
     }
 
 
@@ -42,7 +37,7 @@ public class ResponseUtil {
      * @return 返回具体数据
      */
     public static <T> T extractData(ApiResponseData<T> apiResponseData) {
-        if (apiResponseData.getStatus() == HttpStatus.OK.value()) {
+        if (apiResponseData.getStatus() == ResponseConstants.OK) {
             return apiResponseData.getData();
         } else {
             return null;
