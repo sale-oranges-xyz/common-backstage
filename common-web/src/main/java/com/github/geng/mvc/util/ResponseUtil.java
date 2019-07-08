@@ -29,7 +29,16 @@ public class ResponseUtil {
         return new ApiResponseData(ResponseConstants.ERROR, message);
     }
 
-
+    /**
+     * 创建返回错误数据，状态码自定义
+     * @param message 错误描述信息
+     * @param code 状态码
+     * @return 响应数据
+     */
+    @SuppressWarnings("unchecked")
+    public static ApiResponseData error(String message, int code) {
+        return new ApiResponseData(code, message);
+    }
     /**
      * 微服务提取响应具体数据
      * @param apiResponseData 微服务请求响应
@@ -37,7 +46,7 @@ public class ResponseUtil {
      * @return 返回具体数据
      */
     public static <T> T extractData(ApiResponseData<T> apiResponseData) {
-        if (apiResponseData.getStatus() == ResponseConstants.OK) {
+        if (apiResponseData.getCode() == ResponseConstants.OK) {
             return apiResponseData.getData();
         } else {
             return null;

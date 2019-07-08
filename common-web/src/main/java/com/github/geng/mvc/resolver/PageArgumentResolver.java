@@ -10,6 +10,9 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import sun.util.locale.StringTokenIterator;
+
+import java.util.StringTokenizer;
 
 
 /**
@@ -23,7 +26,7 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
     private static final String ASC = "asc";
     private static final String PAGE_NO_NAME = "page_no";
     private static final String PAGE_SIZE_NAME = "page_size";
-    private static final String SORT = "sort";
+    // private static final String SORT = "sort";
     private static final String SORT_NAME = "page_sort";
 
     /**
@@ -42,7 +45,6 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
                                   NativeWebRequest nativeWebRequest,
                                   WebDataBinderFactory webDataBinderFactory) throws Exception {
 
-        Sort.Direction sort;
         String pageNoStr = nativeWebRequest.getParameter(PAGE_NO_NAME);
         String pageSizeStr = nativeWebRequest.getParameter(PAGE_SIZE_NAME);
         int pageNo = PAGE_NO;
@@ -50,21 +52,30 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
         if (StringUtils.hasText(pageNoStr) && StringUtils.hasText(pageSizeStr)) {
             pageNo = ConverterUtils.StringToIntDefault(pageNoStr, PAGE_NO);
             pageSize = ConverterUtils.StringToIntDefault(pageSizeStr, PAGE_SIZE);
-            String sortValue = nativeWebRequest.getParameter(SORT);
-            String sortName = nativeWebRequest.getParameter(SORT_NAME);
-            if (StringUtils.hasText(sortValue) && StringUtils.hasText(sortName)) {
-               if (sortValue.equals(DESC)) {
-                   sort = Sort.Direction.DESC;
-               } else if (sortValue.equals(ASC)) {
-                   sort = Sort.Direction.ASC;
-               } else {
-                   sort = Sort.Direction.DESC;
-               }
-               return new PageRequest(pageNo-1, pageSize, sort, sortName);
-                //return PageRequest.of(pageNo-1, pageSize, sort, sortName);
+        }
+
+        // 排序参数处理
+        String sortName = nativeWebRequest.getParameter(SORT_NAME);
+        Sort sort = null;
+        Sort subSort;
+        if (StringUtils.hasText(sortName)) {
+            StringTokenizer stringTokenizer = new StringTokenizer(sortName, ",");
+            while (stringTokenizer.hasMoreElements()) {
+                String sortValue = stringTokenizer.nextToken();
+                if (sortValue.contains("_")) {
+                    // 排序参数内容 字段名_排序方式
+                    String[] sortValueArr = sortValue.split("_");
+                    subSort = new Sort(new Sort.Order(Sort.Direction.fromString(sortValueArr[1]), sortValueArr[0]));
+
+                    if (null == sort) {
+                        sort = subSort;
+                    } else {
+                        sort = sort.and(subSort);
+                    }
+                }
             }
         }
-        return new PageRequest(pageNo -1, pageSize, null);
-        //return PageRequest.of(pageNo -1, pageSize, null);
+
+        return new PageRequest(pageNo-1, pageSize, sort);
     }
 }

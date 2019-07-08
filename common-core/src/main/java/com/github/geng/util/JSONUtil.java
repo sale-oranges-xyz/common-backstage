@@ -3,7 +3,7 @@ package com.github.geng.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.geng.bread.NullOptional;
+import com.github.geng.bread.OptionalUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public final class JSONUtil {
      * @return json 数据
      */
     public static /* synchronized */ String createJson(Object value) {
-        return NullOptional.validate(value, (t) -> {
+        return OptionalUtil.ofNullableMapOrElse(value, (t) -> {
             try {
                 return objectMapper.writeValueAsString(t);
             } catch (JsonProcessingException e) {
@@ -43,7 +43,7 @@ public final class JSONUtil {
      * @return java 对象
      */
     public static <T> T readValue (String value, Class<T> clazz) {
-        return NullOptional.validate(value, (t) -> {
+        return OptionalUtil.ofNullableMapOrElse(value, (t) -> {
             try {
                 return objectMapper.readValue(t, clazz);
             } catch (IOException e) {
@@ -60,7 +60,7 @@ public final class JSONUtil {
      * @return 数据集合或者空list
      */
     public static <T> List<T> readListValue(String value) {
-        return NullOptional.validate(value, (t) -> {
+        return OptionalUtil.ofNullableMapOrElse(value, (t) -> {
             try {
                 return objectMapper.readValue(t, new TypeReference<List<T>>() {});
             } catch (IOException e) {

@@ -1,9 +1,7 @@
 package com.github.geng.util;
 
-import com.github.geng.bread.NullOptional;
 import org.hashids.Hashids;
 
-import java.util.Random;
 
 /**
  * 数字类型id编码工具类
@@ -134,7 +132,6 @@ public class IdEncryptUtils {
          }
          return -1L;
      }
-
     public static void main(String[] args) {
         //System.out.println(Base64Util.encode("a"));
         String encodeStr = IdEncryptUtils.encode(1L);

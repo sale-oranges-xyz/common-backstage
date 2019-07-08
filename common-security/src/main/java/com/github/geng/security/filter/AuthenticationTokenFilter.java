@@ -17,12 +17,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Enumeration;
 
 
 /**
@@ -42,7 +40,7 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
+            throws IOException {
 
         try {
             // token
@@ -82,7 +80,7 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
     private void sendErrorMsg (HttpServletResponse response, String errMsg) throws IOException{
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        ErrorMsg errorMsg = new ErrorMsg(errMsg, ResponseConstants.USER_INVALID_TOKEN);
+        ErrorMsg errorMsg = new ErrorMsg(errMsg, DataConstants.USER_TIME_OUT);
         response.getWriter().print(JSONUtil.createJson(errorMsg));
         response.getWriter().flush();
     }

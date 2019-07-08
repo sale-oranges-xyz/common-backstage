@@ -1,7 +1,9 @@
 package com.github.geng.response;
 
+import com.github.geng.constant.ResponseConstants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -12,17 +14,19 @@ import java.io.Serializable;
  */
 @Setter
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class ApiResponseData<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // --------------------------------------------------------------
-    private int status;
+    private int code;
     private T data;
     // --------------------------------------------------------------
     // constructors
-    public ApiResponseData() {
-        super();
+    public ApiResponseData(T data) {
+        this.code = ResponseConstants.OK;
+        this.data = data;
     }
     // --------------------------------------------------------------
     // methods

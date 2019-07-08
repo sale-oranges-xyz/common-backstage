@@ -38,5 +38,4 @@ public class ResponseConstants {
      *  服务端token异常
      */
     public static final int CLIENT_FORBIDDEN = 4403;
-
 }

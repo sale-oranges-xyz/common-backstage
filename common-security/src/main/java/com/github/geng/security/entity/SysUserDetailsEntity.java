@@ -1,33 +1,31 @@
 package com.github.geng.security.entity;
 
+import com.github.geng.constant.DataConstants;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class SysUserDetailsEntity implements SysUserDetails {
 
     private String username;
     private String password;
     private List<GrantedAuthority> grantedAuthorityList;
+    private int status;
 
     // constructors ----------------------------------------------------------
     public SysUserDetailsEntity() {
         this.grantedAuthorityList = new ArrayList<>();
     }
 
-    public SysUserDetailsEntity(String username, String password) {
-        this.username = username;
-        this.password = password;
-        this.grantedAuthorityList = new ArrayList<>();
+    public SysUserDetailsEntity(String username, String password, int status) {
+        this(username, password, Collections.emptyList(), status);
     }
 
-    public SysUserDetailsEntity(String username, String password, List<GrantedAuthority> grantedAuthorityList) {
+    public SysUserDetailsEntity(String username, String password, List<GrantedAuthority> grantedAuthorityList, int status) {
         this.username = username;
         this.password = password;
         this.grantedAuthorityList = grantedAuthorityList;
+        this.status = status;
     }
     // -----------------------------------------------------------------------
     @Override
@@ -52,22 +50,23 @@ public class SysUserDetailsEntity implements SysUserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+
+        return Boolean.TRUE;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return Boolean.TRUE;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return Boolean.TRUE;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return this.status == DataConstants.ENABLE;
     }
 
     // setters ------------------------------------------------------

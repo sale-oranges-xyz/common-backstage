@@ -11,6 +11,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
@@ -55,6 +56,67 @@ public class SimpleJpaRepositoryImpl<M, ID extends Serializable> {
             query.setFirstResult(firstResult);
         if (maxResult > 0)
             query.setMaxResults(maxResult);
+        return query.getResultList();
+    }
+
+    /**
+     * 原生sql查询全部结果集
+     * @param queryStatement 查询语句
+     * @param values 数量可变的参数,按顺序绑定
+     * @return 符合条件纪录列表
+     */
+    public <X> List<X> findAllByNative(final String queryStatement, final Object[] values) {
+        Assert.hasText(queryStatement, "查询语句不能够为空");
+        log.debug("sql statement = {}", queryStatement);
+
+        Query sqlQuery = this.getEntityManager().createNativeQuery(queryStatement);
+        if (null != values && values.length > 0) {
+            log.debug("params =============================================");
+
+            for (int i = 0; i < values.length; i++) {
+                sqlQuery.setParameter(i, values[i]);
+                log.debug("    param_{} = {}", i, values[i]);
+            }
+        } else {
+            log.debug("no params");
+        }
+        return sqlQuery.getResultList();
+    }
+
+    /**
+     * 创建SQL查询对象
+     * @param sqlStatement SQL查询语句
+     * @param values 数量可变的参数,按顺序绑定.
+     * @return 构建好的查询对象
+     */
+    protected Query createNativeQuery(final String sqlStatement, final Object[] values) {
+        Assert.hasText(sqlStatement, "查询语句不能够为空");
+        log.debug("sql statement = {}", sqlStatement);
+
+        Query sqlQuery = this.getEntityManager().createNativeQuery(sqlStatement);
+        if (null != values && values.length > 0) {
+            log.debug("params =============================================");
+
+            for (int i = 0; i < values.length; i++) {
+                sqlQuery.setParameter(i, values[i]);
+                log.debug("    param_{} = {}", i, values[i]);
+            }
+        } else {
+            log.debug("no params");
+        }
+
+        return sqlQuery;
+    }
+
+    /**
+     * 查询全部结果集
+     * @param queryStatement 查询语句
+     * @param values 数量可变的参数,按顺序绑定
+     * @return 符合条件纪录列表
+     */
+    @SuppressWarnings("rawtypes")
+    public <X> List<X> findAll(final String queryStatement, final Object[] values) {
+        Query query = this.createQuery(queryStatement, values);
         return query.getResultList();
     }
 
@@ -169,6 +231,28 @@ public class SimpleJpaRepositoryImpl<M, ID extends Serializable> {
         return query;
     }
 
+    /**
+     * 查询唯一对象
+     * @param queryStatement 查询语句
+     * @param values 数量可变的参数,按顺序绑定
+     * @return 返回唯一对象, 如果不唯一, 则抛出异常
+     */
+    protected <X> X findOne(final String queryStatement, final Object[] values) {
+        try {
+            return (X) this.createQuery(queryStatement, values).getSingleResult();
+        } catch (NoResultException ex) {
+            log.error(ex.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取模糊查询时可以查询的字段列表
+     * @return
+     */
+    protected String[] getSearchPhraseFields(){
+        return new String[0];
+    }
 
     // append 部分 --------------------------------------------------------------------------------
     protected void appendLike(StringBuilder queryStatement, String aliasName, String fieldName, Object value, List<Object> params) {
@@ -177,7 +261,7 @@ public class SimpleJpaRepositoryImpl<M, ID extends Serializable> {
         } else {
             queryStatement.append(String.format(" and %s like ? ", fieldName));
         }
-        params.add(" % " + value + "%");
+        params.add("%" + value + "%");
     }
 
     protected void appendAnd(StringBuilder queryStatement, String aliasName, String fieldName, Object value, List<Object> params) {
@@ -187,6 +271,28 @@ public class SimpleJpaRepositoryImpl<M, ID extends Serializable> {
             queryStatement.append(String.format(" and %s = ? ", fieldName));
         }
         params.add(value);
+    }
+
+    /**
+     * 构建一个字段模糊查询条件
+     * @param aliasName 查询对象的别名
+     * @param searchPhrase 模糊查询条件
+     * @param params
+     * @return
+     */
+    protected String searchPhraseClasuse(String aliasName, String searchPhrase, List<Object> params) {
+        if(StringUtils.isEmpty(searchPhrase)) return "";
+
+        String[] searchPhraseFields = this.getSearchPhraseFields();
+        if(StringUtils.isEmpty(searchPhraseFields)) return "";
+
+        StringBuilder condition = new StringBuilder();
+        for(int i = 0; i < searchPhraseFields.length; i++) {
+            if (i > 0) condition.append(" or ");
+            condition.append(aliasName + "." + searchPhraseFields[i] + " like ? ");
+            params.add("%" + searchPhrase + "%");
+        }
+        return condition.toString();
     }
 
     protected EntityManager getEntityManager() {

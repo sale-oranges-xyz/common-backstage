@@ -21,13 +21,25 @@ public class DataConstants {
      * 删除状态
      */
     public static final int DELETE = 2;
-    // --------------------------------------------------------
-    // 提示语
-    public static final String NO_FOUND = "查无对应记录";
+    // 用户登录异常代码  --------------------------------------------------
+    /**
+     * 用户登录账号密码错误
+     */
+    public static final int USER_ERR_PWD = -1;
+    /**
+     * 用户账号禁止访问
+     */
+    public static final int USER_FORBIDDEN = -2;
+    /**
+     * 用户登录超时
+     */
+    public static final int USER_TIME_OUT = -3;
+    /**
+     * 用户未注册
+     */
+    public static final int USER_NOT_FOUND = -4;
 
-    // 用户权限不足
-    public static final String USER_FORBIDDEN = "用户权限不足";
-    // -------------------------------------------------------
+    // --------------------------------------------------------
     // 网关向内部微服务传递的请求头常量名
     /**
      * 用户id
