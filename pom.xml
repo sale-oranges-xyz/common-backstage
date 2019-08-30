@@ -29,6 +29,7 @@
         <module>common-base-core</module>
         <module>common-excel</module>
         <module>common-orm</module>
+        <module>common-web-security</module>
     </modules>
 
     <properties>

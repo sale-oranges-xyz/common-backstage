@@ -3,6 +3,7 @@ package com.github.geng.security.config;
 import com.github.geng.security.filter.AuthenticationTokenFilter;
 import com.github.geng.security.filter.EntryPointUnauthorizedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,10 +17,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
 
 
 /**
@@ -33,6 +36,7 @@ import java.util.List;
 public class WebSecurityTokenConfig extends AbstractWebSecurityConfig {
 
     private UserDetailsService userDetailsService;
+    private String ignoreAuthUrl;   // 多个,分开
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -49,15 +53,26 @@ public class WebSecurityTokenConfig extends AbstractWebSecurityConfig {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        List<String> ignoreAuthUrls = new ArrayList<>();
+        ignoreAuthUrls.add("/swagger-ui.html");
+        ignoreAuthUrls.add("/swagger-resources/configuration/ui");
+        ignoreAuthUrls.add("/swagger-resources");
+        ignoreAuthUrls.add("/swagger-resources/configuration/security");
+        ignoreAuthUrls.add("/v2/api-docs");
+
+        if (null != this.ignoreAuthUrl) {
+            StringTokenizer stringTokenizer = new StringTokenizer(this.ignoreAuthUrl, ",");
+            while (stringTokenizer.hasMoreElements()) {
+                String url = stringTokenizer.nextToken();
+                if (StringUtils.hasText(url)) {
+                    ignoreAuthUrls.add(url);
+                }
+            }
+        }
+
         http.authorizeRequests()
                 // 不需要验证地址
-                .antMatchers("/swagger-ui.html",
-                        "/swagger-resources/configuration/ui",
-                        "/swagger-resources",
-                        "/swagger-resources/configuration/security",
-                        "/v2/api-docs",
-                        "/api/v1/admin/login",
-                        "/api/v1/admin/logout")
+                .antMatchers(ignoreAuthUrls.toArray(new String[ignoreAuthUrls.size()]))
                 .permitAll() // 不需要验证路径
                 .anyRequest().authenticated()   // 其他地址的访问均需验证权限
 
@@ -107,5 +122,9 @@ public class WebSecurityTokenConfig extends AbstractWebSecurityConfig {
     @Autowired
     public void setUserDetailsService(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
+    }
+    @Value("${security.ignore}")
+    public void setIgnoreAuthUrl(String ignoreAuthUrl) {
+        this.ignoreAuthUrl = ignoreAuthUrl;
     }
 }

@@ -49,4 +49,16 @@ public class DataConstants {
      * 用户名称
      */
     public static final String USER_NAME = "userName";
+
+    // --------------------------------------------------------
+    // 微信相关
+    /**
+     * 类型：微信小程序
+     */
+    public static final int WX_MIN_APP_TYPE = 0;
+
+    /**
+     * 类型：微信
+     */
+    public static final int WX_TYPE = 1;
 }

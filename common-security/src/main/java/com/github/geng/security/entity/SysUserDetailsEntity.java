@@ -12,13 +12,17 @@ public class SysUserDetailsEntity implements SysUserDetails {
     private List<GrantedAuthority> grantedAuthorityList;
     private int status;
 
+    // 自定义属性
+    private String id;          // 唯一主键
+
     // constructors ----------------------------------------------------------
     public SysUserDetailsEntity() {
         this.grantedAuthorityList = new ArrayList<>();
     }
 
-    public SysUserDetailsEntity(String username, String password, int status) {
+    public SysUserDetailsEntity(String id, String username, String password, int status) {
         this(username, password, Collections.emptyList(), status);
+        this.id = id;
     }
 
     public SysUserDetailsEntity(String username, String password, List<GrantedAuthority> grantedAuthorityList, int status) {
@@ -27,6 +31,7 @@ public class SysUserDetailsEntity implements SysUserDetails {
         this.grantedAuthorityList = grantedAuthorityList;
         this.status = status;
     }
+
     // -----------------------------------------------------------------------
     @Override
     public boolean isUpdatedPassword(Date tokenExpirationDate) {
@@ -50,7 +55,6 @@ public class SysUserDetailsEntity implements SysUserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-
         return Boolean.TRUE;
     }
 
@@ -69,12 +73,21 @@ public class SysUserDetailsEntity implements SysUserDetails {
         return this.status == DataConstants.ENABLE;
     }
 
-    // setters ------------------------------------------------------
+    // setters -----------------------------------------------------------
     public void setPassword(String password) {
         this.password = password;
     }
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    // getters -----------------------------------------------------------
+    public String getId() {
+        return id;
     }
 }

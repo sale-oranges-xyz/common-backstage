@@ -14,6 +14,8 @@ public class DateUtils {
 
     public static String YYYY_MM_DD_HH_mm_ss  = "yyyy-MM-dd HH:mm:ss";
 
+    private static ZoneId ZONE_ID = ZoneId.systemDefault();
+
     public static Date formatDate(String text, String pattern) {
         try {
             DateFormatter dateFormatter = new DateFormatter(pattern);
@@ -35,15 +37,14 @@ public class DateUtils {
             date = new Date();
         }
 
-        ZoneId zoneId = ZoneId.systemDefault();
-        LocalDate localDate = date.toInstant().atZone(zoneId).toLocalDate();
+        LocalDate localDate = date.toInstant().atZone(ZONE_ID).toLocalDate();
 
         LocalDateTime startLocalDateTime = localDate.atTime(0, 0, 0, 0);
         LocalDateTime endLocalDateTime = localDate.atTime(23, 59, 59, 0);
 
         return new Date[] {
-                Date.from(startLocalDateTime.atZone(zoneId).toInstant()),
-                Date.from(endLocalDateTime.atZone(zoneId).toInstant())
+                Date.from(startLocalDateTime.atZone(ZONE_ID).toInstant()),
+                Date.from(endLocalDateTime.atZone(ZONE_ID).toInstant())
         };
     }
 
@@ -54,8 +55,13 @@ public class DateUtils {
      * @return 加减后日期
      */
     public static Date dayPlus(Date date, long daysToAdd) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        LocalDateTime localDateTime = date.toInstant().atZone(zoneId).toLocalDateTime().plusDays(daysToAdd);
-        return Date.from(localDateTime.atZone(zoneId).toInstant());
+        LocalDateTime localDateTime = date.toInstant().atZone(ZONE_ID).toLocalDateTime().plusDays(daysToAdd);
+        return Date.from(localDateTime.atZone(ZONE_ID).toInstant());
+    }
+
+
+    public static int currentHour() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        return localDateTime.getHour();
     }
 }

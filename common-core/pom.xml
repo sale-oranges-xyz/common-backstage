@@ -11,8 +11,11 @@
 
     <artifactId>common-core</artifactId>
 
-    <dependencies>
+    <properties>
+        <com.google.zxing.version>3.3.0</com.google.zxing.version>
+    </properties>
 
+    <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -65,6 +68,19 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
+
+        <!-- 二维码工具包 -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>${com.google.zxing.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>${com.google.zxing.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

@@ -18,6 +18,7 @@ public abstract class AbstractWebSecurityConfig extends WebSecurityConfigurerAda
                 "/**/*.jpg",
                 "/**/fonts/**",
                 "/images/**",
+                "*.gif",
                 "/**/*.ico");
     }
 

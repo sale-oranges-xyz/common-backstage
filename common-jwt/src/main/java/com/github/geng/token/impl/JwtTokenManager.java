@@ -36,9 +36,10 @@ public class JwtTokenManager implements TokenService {
         if (expiration.before(new Date())) {
             throw new NotLoginException("用户token已过期");
         }
-        // 获取用户id
+        // 获取用户id，登录名称
         String userId = SysStringUtil.getStringValue(claims.get(TokenConstants.RECORD_ID));
-        return new TokenInfo(userId, claims.getSubject(), expiration);
+        String userName = SysStringUtil.getStringValue(claims.get(TokenConstants.CLAIM_KEY_USERNAME));
+        return new TokenInfo(userId, userName, expiration);
     }
 
     @Override

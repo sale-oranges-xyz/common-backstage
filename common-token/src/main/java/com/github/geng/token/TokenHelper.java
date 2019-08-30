@@ -3,6 +3,7 @@ package com.github.geng.token;
 import com.github.geng.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -13,10 +14,13 @@ import java.util.List;
 @Service
 public class TokenHelper {
 
+    @Value("${token.type}")
+    private String tokenType;
+
     private List<TokenService> tokenServices;
 
-    public TokenService findMatchService(String type) {
-        if (StringUtils.isEmpty(type)) {
+    public TokenService findMatchService() {
+        if (StringUtils.isEmpty(this.tokenType)) {
             log.debug("系统未开启token处理逻辑");
             return null;
         }
@@ -26,7 +30,7 @@ public class TokenHelper {
             return null;
         }
         for (TokenService tokenService : tokenServices) {
-            if (tokenService.isMatch(type)) {
+            if (tokenService.isMatch(this.tokenType)) {
                 return tokenService;
             }
         }

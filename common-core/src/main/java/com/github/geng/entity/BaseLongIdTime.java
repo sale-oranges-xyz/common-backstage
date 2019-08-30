@@ -27,5 +27,7 @@ public class BaseLongIdTime extends BaseLongId {
     public BaseLongIdTime(Long id) {
         super(id);
     }
-
+    public BaseLongIdTime(Date date) {
+        this.createdTime = this.modifiedTime = date;
+    }
 }

@@ -8,13 +8,17 @@ import com.github.geng.mvc.util.RequestUtil;
 import com.github.geng.mvc.util.ResponseUtil;
 import com.github.geng.response.ApiPage;
 import com.github.geng.response.ApiResponseData;
+import com.github.geng.security.entity.SysUserDetailsEntity;
+import com.github.geng.security.util.SecurityUtils;
 import com.github.geng.util.IdEncryptUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,24 +32,23 @@ public class BaseController {
      * @return 用户信息
      */
     protected UserInterface getUserInfo() {
-        // 获取token
-        HttpServletRequest request = RequestUtil.getRequest();
-        String userId = request.getHeader(DataConstants.USER_ID);
-        String userName = request.getHeader(DataConstants.USER_NAME);
-        if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(userName)) {
-            logger.debug("无法从请求头获取用户信息");
-            throw new NotLoginException("用户未登陆");
+        SysUserDetailsEntity sysUserDetailsEntity = SecurityUtils.getCurUserDetails();
+
+        if (null != sysUserDetailsEntity) {
+            return new UserInterface() {
+                @Override
+                public String getUserId() {
+                    return sysUserDetailsEntity.getId();
+                }
+                @Override
+                public String getUserName() {
+                    return sysUserDetailsEntity.getUsername();
+                }
+            };
+        } else {
+            logger.debug("用户未登录");
+            throw new NotLoginException("用户未登录");
         }
-        return new UserInterface() {
-            @Override
-            public String getUserId() {
-                return userId;
-            }
-            @Override
-            public String getUserName() {
-                return userName;
-            }
-        };
     }
 
     /**
@@ -86,6 +89,10 @@ public class BaseController {
      */
     protected <T> ApiResponseData<ApiPage<T>> wrapPage(List<T> dtoList, Page page) {
         return ResponseUtil.success(new ApiPage<>(page.getTotalPages(), page.getTotalElements(), page.getSize(), dtoList));
+    }
+
+    protected <T> ApiResponseData<ApiPage<T>> blankPage() {
+        return ResponseUtil.success(new ApiPage<>(0, 0, 0, new ArrayList<>()));
     }
 
     protected Long decode(String id) {

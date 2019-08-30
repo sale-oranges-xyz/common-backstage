@@ -10,7 +10,6 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import sun.util.locale.StringTokenIterator;
 
 import java.util.StringTokenizer;
 
@@ -22,7 +21,6 @@ import java.util.StringTokenizer;
 public class PageArgumentResolver implements HandlerMethodArgumentResolver {
     private static final int PAGE_NO = 1;
     private static final int PAGE_SIZE = 20;
-    private static final String DESC = "desc";
     private static final String ASC = "asc";
     private static final String PAGE_NO_NAME = "page_no";
     private static final String PAGE_SIZE_NAME = "page_size";
@@ -65,7 +63,14 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
                 if (sortValue.contains("_")) {
                     // 排序参数内容 字段名_排序方式
                     String[] sortValueArr = sortValue.split("_");
-                    subSort = new Sort(new Sort.Order(Sort.Direction.fromString(sortValueArr[1]), sortValueArr[0]));
+                    Sort.Direction direction;
+                    if (StringUtils.isEmpty(sortValueArr[1])) {
+                        direction = Sort.Direction.fromString(ASC);
+                    } else {
+                        direction = Sort.Direction.fromString(sortValueArr[1]);
+                    }
+
+                    subSort = new Sort(new Sort.Order(direction, sortValueArr[0]));
 
                     if (null == sort) {
                         sort = subSort;

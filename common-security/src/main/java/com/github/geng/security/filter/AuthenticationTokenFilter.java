@@ -61,9 +61,8 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
                         // 将权限写入本次会话
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
-                        // 用户信息写入request
-                        httpRequest.setAttribute(DataConstants.USER_ID, tokenInfo.getId());
-                        httpRequest.setAttribute(DataConstants.USER_NAME, tokenInfo.getName());
+
+                        // 获取用户信息，请使用 com.github.geng.security.util.SecurityUtils 工具类
                         chain.doFilter(httpRequest, response);
                         return;
                     }
