@@ -13,7 +13,7 @@
     <description>API接口文档，swagger 配置</description>
 
     <properties>
-        <swagger-version>2.7.0</swagger-version>
+        <swagger-version>2.10.0</swagger-version>
     </properties>
 
     <dependencies>
